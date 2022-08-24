@@ -367,5 +367,4 @@ appsettings.json
 #Adding
 *.DS_Store
 *.xml
-*.json
 *.csv

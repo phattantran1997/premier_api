@@ -86,9 +86,6 @@ namespace API_premierductsqld.Service
             {
                 var content = response.Content.ReadAsAsync<ResponseData>().Result;
                 List<OperatorReponse> dataResponse = JsonConvert.DeserializeObject<List<OperatorReponse>>(content.Data.ToString()); //Converts JSON string to dynamic
-
-
-
                 userOnlines = dataResponse.Select(i => i.Username).ToList();
             }
         }
@@ -697,6 +694,7 @@ namespace API_premierductsqld.Service
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                throw ex;
             }
 
         }
@@ -721,15 +719,12 @@ namespace API_premierductsqld.Service
 
                 mail.Subject = "Report Weekly";
                 mail.Body = "mail with attachment";
-
                 System.Net.Mail.Attachment attachment;
                 attachment = new System.Net.Mail.Attachment(file_name_weekly+".xlsx");
                 mail.Attachments.Add(attachment);
-
                 SmtpServer.Port = 587;
                 SmtpServer.Credentials = new System.Net.NetworkCredential("noreply@premierducts.com.au", "Wondergood101!");
                 SmtpServer.EnableSsl = true;
-
                 SmtpServer.Send(mail);
                 Debug.Write("mail Send");
             }
