@@ -180,7 +180,7 @@ namespace API_premierductsqld.Repository.impl
                 }
 
             }
-            catch (Exception e)
+            catch
             {
                 response = null;
             }

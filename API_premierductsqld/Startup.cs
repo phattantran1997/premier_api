@@ -27,17 +27,9 @@ namespace API_premierductsqld
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //services.AddEntityFrameworkMySQL()
-            // .AddDbContext<AppDbContext>(options =>
-            // {
-            //     options.UseMySQL(Configuration.GetConnectionString("ConnectionForDatabase"));
-            // });
-
-            
             services.AddCors();
             services.AddControllers();
            
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

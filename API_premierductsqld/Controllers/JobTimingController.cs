@@ -34,13 +34,14 @@ namespace API_premierductsqld.Controllers
         }
 
 
-        /// <summary>
-        /// Get list jobno which were string by specific date.
-        /// </summary>
-        /// 
-        /// <param name="date"></param>
-        /// <returns></returns>
-        [HttpGet("list/dates")]
+    /// <summary>
+    /// Get list jobno which were string by specific date.
+    /// </summary>
+    /// 
+    /// <param name="date"></param>
+    ///  <param name="end"></param>
+    /// <returns></returns>
+    [HttpGet("list/dates")]
         public ResponseData getListJobNoString([Required]string date, string end)
         {
 
@@ -48,13 +49,14 @@ namespace API_premierductsqld.Controllers
         }
 
 
-        /// <summary>
-        /// Get all data include jobno, history, total duration by startdate and enddate
-        /// </summary>
-        /// 
-        /// <param name="date"></param>
-        /// <returns></returns>
-        [HttpGet("all/data/tab3")]
+    /// <summary>
+    /// Get all data include jobno, history, total duration by startdate and enddate
+    /// </summary>
+    /// 
+    /// <param name="date"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    [HttpGet("all/data/tab3")]
         public Task<ResponseData> getAllDataTabs3([Required] string date, string end)
         {
             string token = Request.Headers["Token"].FirstOrDefault()?.Split(" ").Last();
@@ -65,7 +67,7 @@ namespace API_premierductsqld.Controllers
         /// Get detail list jobtiming
         /// </summary>
         /// 
-        /// <param name="list jobno"></param>
+        /// <param name="jobno"></param>
         /// <returns></returns>
         [HttpPost("data/detail")]
         public ResponseData getJobTimingsDetail([Required][FromBody] List<string> jobno)
@@ -78,7 +80,7 @@ namespace API_premierductsqld.Controllers
         /// Get  all jobtiming specific date
         /// </summary>
         /// 
-        /// <param name="string date"></param>
+        /// <param name="date"></param>
         /// <returns></returns>
         [HttpGet("all/data/by_date")]
         public ResponseData getAllDataJobtimingByDate(string date)

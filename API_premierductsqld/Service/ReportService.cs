@@ -79,9 +79,7 @@ namespace API_premierductsqld.Service
         public void getAllUserDataForReport()
         {
             string url = Startup.StaticConfig.GetSection("URLForAppUserAPI").Value + "/user/getUserForReport";
-            //Sends request to retrieve data from the web service for the specified Uri
             var response = client.GetAsync(url).Result;
-
             if (response.IsSuccessStatusCode)
             {
                 var content = response.Content.ReadAsAsync<ResponseData>().Result;
@@ -89,6 +87,7 @@ namespace API_premierductsqld.Service
                 userOnlines = dataResponse.Select(i => i.Username).ToList();
             }
         }
+
         public string getNameOfStation(int stationNO)
         {
             if (stationNO > 0)
@@ -99,10 +98,8 @@ namespace API_premierductsqld.Service
 
 
         //done
-        public async Task<ActionResult<List<ReportResponse>>> report1data()
+        public List<ReportResponse> report1data()
         {
-
-
             foreach (String userOnline in userOnlines)
             {
                
@@ -112,9 +109,7 @@ namespace API_premierductsqld.Service
 
                 ReportResponse reportResponse = new ReportResponse();
 
-             
-
-                reportResponses.Add(new ReportResponse(current, userOnline,
+                 reportResponses.Add(new ReportResponse(current, userOnline,
 
 
                    (firsttime!=null ? firsttime.jobtime : null),
@@ -127,20 +122,13 @@ namespace API_premierductsqld.Service
             return reportResponses;
         }
 
-        //break time = first logout
-        //report calculate breake_time
-        public async Task<ActionResult<List<ReportResponse>>> report2data()
+        public List<ReportResponse> report2data()
         {
             report1data();
             reportResponses = reportResponses.OrderBy(x => x.time_start).ToList();
             foreach (ReportResponse report in reportResponses)
             {
-
                 var item = jobTimings.OrderBy(i => i.jobtime).FirstOrDefault(i => i.jobno.Contains(" - logout") && i.operatorID == report.user);
-                //var item = jobTimings.Where(i => i.jobno.Contains(" - logout") && i.operatorID == report.user).OrderBy(i => i.jobtime).Reverse().Skip(1)
-                //    .FirstOrDefault();
-
-
                 if (item != null)
                 {
                     report.breaking_time = item.jobtime;
@@ -157,19 +145,13 @@ namespace API_premierductsqld.Service
         }
 
         /*to do: Fix logic code for report 3*/
-        public async Task<ActionResult<List<ReportResponse>>> report3data()
+        public List<ReportResponse> report3data()
         {
-
             report2data();
-
             foreach (ReportResponse report in reportResponses)
             {
-
                 var allListOfEachUsers = jobTimings.Where(it => it.operatorID == report.user).ToList();
-
-
                 var itemContaimLogout = allListOfEachUsers.FirstOrDefault(x => x.jobno.Contains(" - logout"));
-
                 if (itemContaimLogout != null)
                 {
                     int indexItemContaimLogout = allListOfEachUsers.IndexOf(itemContaimLogout);
@@ -218,7 +200,7 @@ namespace API_premierductsqld.Service
         }
 
 
-        public async Task<ActionResult<List<ReportResponse>>> report4data()
+        public List<ReportResponse> report4data()
         {
             report3data();
 
@@ -381,7 +363,7 @@ namespace API_premierductsqld.Service
             var reportResponses = report1data();
 
             int i = 1;
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
 
                 table.Rows.Add(respone.date, i, respone.user, respone.time_start, respone.area,
@@ -391,7 +373,7 @@ namespace API_premierductsqld.Service
             }
 
 
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
                 getJobTimingDetail(current, respone.user, table);
             }
@@ -414,14 +396,14 @@ namespace API_premierductsqld.Service
             var reportResponses = report2data();
 
             int i = 1;
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
                 table.Rows.Add(respone.date, i, respone.user, respone.time_start, respone.area,
                     respone.time_first_job, respone.job_no, respone.breaking_time);
                 i++;
 
             }
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
                 getJobTimingDetail(current, respone.user, table);
             }
@@ -444,7 +426,7 @@ namespace API_premierductsqld.Service
             //add data
             var reportResponses = report3data();
             int i = 1;
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
                 table.Rows.Add(respone.date, i, respone.user, respone.time_start, respone.area,
                     respone.time_first_job, respone.job_no, respone.breaking_time,
@@ -454,7 +436,7 @@ namespace API_premierductsqld.Service
                 i++;
 
             }
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
                 getJobTimingDetail(current, respone.user, table);
             }
@@ -477,7 +459,7 @@ namespace API_premierductsqld.Service
             //add data
             var reportResponses = report4data();
             int i = 1;
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
 
 
@@ -520,7 +502,7 @@ namespace API_premierductsqld.Service
                (int)TimeSpan.FromSeconds(total_sum_prod_time).TotalHours + TimeSpan.FromSeconds(total_sum_prod_time).ToString(@"\:mm\:ss"),
                (int)TimeSpan.FromSeconds(total_total_working_time).TotalHours + TimeSpan.FromSeconds(total_total_working_time).ToString(@"\:mm\:ss"));
 
-            foreach (ReportResponse respone in reportResponses.Result.Value)
+            foreach (ReportResponse respone in reportResponses)
             {
 
 
@@ -540,7 +522,7 @@ namespace API_premierductsqld.Service
 
         }
 
-        public async void getJobTimingDetail(string jobday, string operatorID, DataTable table)
+        public void getJobTimingDetail(string jobday, string operatorID, DataTable table)
         {
             List<JobTimingResponse> jobDetailHistory = new List<JobTimingResponse>();
             jobDetailHistory = jobTimings.Where(x =>
@@ -568,11 +550,8 @@ namespace API_premierductsqld.Service
 
                 }
                 table.Rows.Add(current, jobDetailHistory[i].jobno, jobDetailHistory[i].jobtime, duration, operatorID, getNameOfStation(jobDetailHistory[i].stationNo), jobDetailHistory[i].itemno);
-
-
             }
         }
-
         //delete file using :  File.Delete(filePath);
         public void ToCSV(DataTable dtDataTable)
         {
@@ -674,20 +653,14 @@ namespace API_premierductsqld.Service
                 {
                     mail.To.Add(email);
                 }
-          
-
-
                 mail.Subject = "Report Daily";
                 mail.Body = "mail with attachment";
-
                 System.Net.Mail.Attachment attachment;
                 attachment = new System.Net.Mail.Attachment(current.Replace("/", "") + ".csv");
                 mail.Attachments.Add(attachment);
-
                 SmtpServer.Port = 587;
                 SmtpServer.Credentials = new System.Net.NetworkCredential("noreply@premierducts.com.au", "Wondergood101!");
                 SmtpServer.EnableSsl = true;
-
                 SmtpServer.Send(mail);
                 Debug.Write("mail Send");
             }
@@ -696,7 +669,6 @@ namespace API_premierductsqld.Service
                 Console.WriteLine(ex.ToString());
                 throw ex;
             }
-
         }
 
         public void SendEmailWeekend()
@@ -877,7 +849,6 @@ namespace API_premierductsqld.Service
             table.Rows.Add("FROM", valueOfWeek.First(), "TO", valueOfWeek.Last(), "", "" , "", "");
             table.Rows.Add();
 
-            int count = 0;
             double total_break_time_on_each_user = 0;
             double time_production_on_each_user = 0;
             double time_non_production_on_each_user = 0;

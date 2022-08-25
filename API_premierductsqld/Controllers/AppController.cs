@@ -12,8 +12,6 @@ namespace API_premierductsqld.Controllers
     /// <summary>
     /// API for Dashboard
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     [ApiController]
     [Authorize]
     [Route("app")]
@@ -21,12 +19,10 @@ namespace API_premierductsqld.Controllers
     {
         private JobTimingService jobTimingService ;
 
-
         public AppController()
         {
            jobTimingService = new JobTimingService();
         }
-
 
         /// <summary>
         /// Load all station on dashboard with Rate
@@ -45,7 +41,7 @@ namespace API_premierductsqld.Controllers
         /// </summary>
         /// 
         /// <param name="date"></param>
-        /// <param name="stationNo"></param>
+        /// <param name="station"></param>
         /// <returns></returns>
         [HttpGet("job/data/by_station")]
         public Task<ResponseData> getJobDataByStation(

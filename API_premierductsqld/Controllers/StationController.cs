@@ -34,6 +34,7 @@ namespace API_premierductsqld.Controllers
         /// </summary>
         /// 
         /// <param name="jobno"></param>
+        /// <param name="stationNo"></param>
         /// <returns>ResponseData</returns>
         [HttpGet("all/duration/{jobno}")]
         public ResponseData getDurationOfStation(string jobno, int stationNo)
