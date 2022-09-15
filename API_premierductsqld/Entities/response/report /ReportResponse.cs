@@ -6,20 +6,13 @@ namespace API_premierductsqld.Entities.response
 
         public string date { get; set; }
         public string user { get; set; }
-
         public string time_start { get; set; }
-
         public string area { get; set; }
-
         public string time_first_job { get; set; }
-
         public string job_no { get; set; }
- 
         public string breaking_time { get; set; }
-
         public string time_back { get; set; }
         public string area_back { get; set; }
-
         public string time_of_jab { get; set; }
         public string job_after_back { get; set; }
         public string time_finished { get; set; }

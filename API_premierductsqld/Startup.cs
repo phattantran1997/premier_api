@@ -44,11 +44,6 @@ namespace API_premierductsqld
                         Email = "phat@PremierDucts.com.au"
 
                     },
-                    //License = new OpenApiLicense
-                    //{
-                    //    Name = "PremierDucts",
-                    //    Url = new Uri("https://example.com/license"),
-                    //}
                 });
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
@@ -87,8 +82,6 @@ namespace API_premierductsqld
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-
-       
 
             // custom jwt auth middleware
             app.UseMiddleware<JwtMiddleware>();

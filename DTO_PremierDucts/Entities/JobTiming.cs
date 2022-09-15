@@ -1,5 +1,5 @@
 ﻿using System;
-namespace API_premierductsqld.Entities
+namespace DTO_PremierDucts.Entities
 {
     public class JobTiming
     {

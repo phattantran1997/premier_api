@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace API_premierductsqld.Entities
+namespace DTO_PremierDucts.Entities
 {
     public class DispatchDetail
     {
@@ -27,8 +27,8 @@ namespace API_premierductsqld.Entities
         public string description { get; set; }
         public string doublewall { get; set; }
         public int pathId { get; set; }
-        public double insulationarea { get; set; }
-        public double metalarea { get; set; }
+        public string insulationarea { get; set; }
+        public string metalarea { get; set; }
         public string boughtout { get; set; }
         public string linearmeter { get; set; }
         public string sectionindex { get; set; }
@@ -42,6 +42,7 @@ namespace API_premierductsqld.Entities
         public string material { get; set; }
         public string equipmentTag { get; set; }
         public string jobArea { get; set; }
+        public string filename { get; set; }
         public DispatchDetail()
         {
         }

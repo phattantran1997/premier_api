@@ -42,6 +42,6 @@ namespace API_premierductsqld.Entities.response
         public string stationName { get; set; }
         public string stationStatus { get; set; }
 
-     
+
     }
 }

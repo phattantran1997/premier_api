@@ -30,10 +30,8 @@ namespace DTO_PremierDucts
                     validateToken(context, token);
                
             }
-         
 
             await _next(context);
-
 
         }
 

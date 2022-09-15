@@ -1,3 +1,5 @@
+using DTO_PremierDucts.Entities;
+
 public class LoginUserResponse
 {
 

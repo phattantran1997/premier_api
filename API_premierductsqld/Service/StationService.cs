@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using API_premierductsqld.Entities.response;
-using API_premierductsqld.Repository.impl;
-using API_premierductsqld.Repository.@interface;
+using API_premierductsqld.Repository;
 using DTO_PremierDucts;
 
 namespace API_premierductsqld.Service
@@ -13,8 +12,6 @@ namespace API_premierductsqld.Service
         public StationService()
         {
             stationRepository = new StationRepository();
-
-   
         }
         public ResponseData getAllStation()
         {

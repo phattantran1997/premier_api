@@ -15,13 +15,13 @@ namespace API_premierductsqld.Controllers
     [ApiController]
     [Authorize]
     [Route("app")]
-    public class AppController :ControllerBase
+    public class AppController : ControllerBase
     {
-        private JobTimingService jobTimingService ;
+        private JobTimingService jobTimingService;
 
         public AppController()
         {
-           jobTimingService = new JobTimingService();
+            jobTimingService = new JobTimingService();
         }
 
         /// <summary>
@@ -36,6 +36,7 @@ namespace API_premierductsqld.Controllers
         {
             return jobTimingService.GetAllStationWithRate(date);
         }
+
         /// <summary>
         /// When user click Station will request data list of JobNo data
         /// </summary>
@@ -45,22 +46,11 @@ namespace API_premierductsqld.Controllers
         /// <returns></returns>
         [HttpGet("job/data/by_station")]
         public Task<ResponseData> getJobDataByStation(
-        [Required(ErrorMessage = "station is required")] int station,
-        [Required(ErrorMessage = "Date is required")] string date)
+          [Required(ErrorMessage = "station is required")] int station,
+          [Required(ErrorMessage = "Date is required")] string date)
         {
             return jobTimingService.getJobDataByStation(station, date); ;
 
-        }
-        /// <summary>
-        /// test call api in QLDData Database
-        /// </summary>
-        /// 
-        /// <param name="date"></param>
-        /// <returns></returns>
-        [HttpGet("test")]
-        public Task<List<Qlddataresponse>> tempCallApi(string date)
-        {
-            return jobTimingService.TestAsync(date);
         }
 
     }

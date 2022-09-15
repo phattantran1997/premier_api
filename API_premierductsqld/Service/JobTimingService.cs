@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using API_premierductsqld.Entities;
 using API_premierductsqld.Entities.response;
-using API_premierductsqld.Repository.impl;
-using API_premierductsqld.Repository.@interface;
+using API_premierductsqld.Repository;
 using API_qlddata.Entity.request;
 using DTO_PremierDucts;
 using Newtonsoft.Json;
@@ -91,10 +90,7 @@ namespace API_premierductsqld.Service
             HttpClient client = new HttpClient(clientHandler);
 
             client.DefaultRequestHeaders.Add("Token", token);
-            String url_qldata_listjobno = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + "/dashboard/total/all/m2";
-
-          
-
+            String url_qldata_listjobno = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + APIPath.HttpCommands[API_TYPE.QLD_TOTAL_ALL_M2];
             var json = JsonConvert.SerializeObject(jobNoandStationNoResponses.Select(x=>x.jobNo).ToList().Distinct());
             var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
             var pos = await client.PostAsync(url_qldata_listjobno, stringContent);
@@ -154,67 +150,6 @@ namespace API_premierductsqld.Service
             return responseData;
         }
 
-
-        public async Task<List<Qlddataresponse>> TestAsync(string date)
-        {
-            HttpClient client = new HttpClient();
-            List<Qlddataresponse> rsult = new List<Qlddataresponse>() ;
-
-            List<string> distinct =  jobtimingRepository.getListJobNoString(date,"");
-
-
-            var json = JsonConvert.SerializeObject(distinct);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var url = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + "/dashboard/get/all/qldata";
-            var responseFromAPI = await client.PostAsync(url, data);
-
-            if (responseFromAPI.IsSuccessStatusCode)
-            {
-
-                var content = responseFromAPI.Content.ReadAsStringAsync(); //Returns the response as JSON string
-
-
-                rsult = JsonConvert.DeserializeObject<List<Qlddataresponse>>(content.Result); //Converts JSON string to dynamic
-
-
-
-            }
-            return rsult;
-        }
-        //public async Task<List<JobTimingResponse>> listJobTimingOnTabJobs(string time_start , string time_end, string stationName)
-        //{
-        //    HttpClient client = new HttpClient();
-        //    List<JobTimingResponse> jobTimingResponses = jobtimingRepository.listJobTimingOnTabJobs(time_start, time_end);
-
-
-        //    var json = JsonConvert.SerializeObject(new GetM2DataResquest(stationName, jobTimingResponses.Select(i => i.jobno).ToList()));
-        //    var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //    var url = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + "/dashboard/get/m2/detail";
-
-          
-        //    var responseFromAPI = await client.PostAsync(url, data);
-
-
-        //    if (responseFromAPI.IsSuccessStatusCode)
-        //    {
-
-        //        var content = responseFromAPI.Content.ReadAsStringAsync(); //Returns the response as JSON string
-
-
-        //        List<Qlddataresponse> rsult = JsonConvert.DeserializeObject<List<Qlddataresponse>>(content.Result); //Converts JSON string to dynamic
-
-
-        //        foreach(JobTimingResponse job in jobTimingResponses)
-        //        {
-        //            job.
-        //        }
-        //    }
-
-
-        //}
-        
         public ResponseData getJobTimingsDetail(List<string> jobno)
         {
             ResponseData responseData = new ResponseData();
@@ -265,30 +200,16 @@ namespace API_premierductsqld.Service
 
                 //get List data in interface repository
                 List<ListJobNoDashBoardResponse> rsult = jobtimingRepository.getListDetailJobNoOnDashboard(date, station);
-
-
-
-
                 var json = JsonConvert.SerializeObject(new GetM2DataResquest(station_name, rsult.Select(i => i.jobno).ToList()));
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var url = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + "/dashboard/get/m2/detail";
-
-                //string url = configuration.GetSection("URLForQLDDataAPI").Value + "/dashboard/get/m2/detail?station=" +
-                //    station_name + "&jobno="+item.jobno;
+                var url = Startup.StaticConfig.GetSection("URLForQLDDataAPI").Value + APIPath.HttpCommands[API_TYPE.QLD_TOTAL_ALL_M2];
                 //Sends request to retrieve data from the web service for the specified Uri
                 var responseFromAPI = await client.PostAsync(url, data);
 
                 if (responseFromAPI.IsSuccessStatusCode)
                 {
-
                     var content = responseFromAPI.Content.ReadAsStringAsync(); //Returns the response as JSON string
-
-
                     List<M2DataResponse> dataResponse = JsonConvert.DeserializeObject<List<M2DataResponse>>(content.Result); //Converts JSON string to dynamic
-
-
-
                     foreach (M2DataResponse response in dataResponse)
                     {
                         ListJobNoDashBoardResponse listJobNoDashBoardResponse = rsult.Where(i => i.jobno.Equals(response.jobNO)).FirstOrDefault();

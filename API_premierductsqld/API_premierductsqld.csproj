@@ -20,7 +20,6 @@
     <None Remove="Entities\Relationships\" />
     <None Remove="Repository\" />
     <None Remove="Repository\inf\" />
-    <None Remove="Repository\impl\" />
     <None Remove="Entities\response\report \" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="Swashbuckle" />
@@ -32,19 +31,21 @@
     <None Remove="Microsoft.AspNetCore.Authentication" />
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <None Remove="Properties\PublishProfiles\" />
+    <None Remove="Global\" />
+    <None Remove="Microsoft.Office.Interop.Excel" />
+    <None Remove="Spire.XLS" />
+    <None Remove="ClosedXML" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Service\" />
     <Folder Include="Entities\" />
     <Folder Include="Entities\response\" />
     <Folder Include="Entities\request\" />
-    <Folder Include="Entities\Objects\" />
     <Folder Include="Repository\" />
-    <Folder Include="Repository\interface\" />
-    <Folder Include="Repository\impl\" />
     <Folder Include="Entities\response\report \" />
     <Folder Include="Exceptions\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Global\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4">
@@ -60,6 +61,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.96.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DTO_PremierDucts\DTO_PremierDucts.csproj">

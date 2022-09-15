@@ -34,6 +34,7 @@ namespace DTO_PremierDucts.DBClient
                     return false;
 
                 Connection = new MySqlConnection(ConnectionString);
+                DatabaseName = Connection.Database;
                 Connection.Open();
             }
 

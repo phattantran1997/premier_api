@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using API_premierductsqld.Entities;
-using API_premierductsqld.Entities.response;
-using API_premierductsqld.Repository.impl;
-using API_premierductsqld.Repository.@interface;
-using DTO_PremierDucts;
+using API_premierductsqld.Repository;
 using DTO_PremierDucts.DBClient;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
@@ -15,7 +12,6 @@ namespace API_premierductsqld.Service
 {
     public class UserService
     {
-
         public IStationRepository stationRepository;
         private DBConnection dbCon;
 
@@ -37,9 +33,7 @@ namespace API_premierductsqld.Service
                 {
 
                     DataTable dataTable = new DataTable();
-
-
-                    string query = "SELECT * FROM premierductsqld.stationAttendees;";
+                    string query = "SELECT * FROM stationAttendees;";
                     MySqlDataAdapter myDataAdapter = new MySqlDataAdapter(query, dbCon.Connection);
                     myDataAdapter.Fill(dataTable);
                     foreach (DataRow row in dataTable.Rows)

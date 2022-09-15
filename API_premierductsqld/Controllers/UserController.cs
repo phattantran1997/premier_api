@@ -23,13 +23,13 @@ namespace API_premierductsqld.Controllers
         [HttpGet("getAllOnlineUser")]
         public Task<List<StationAttendees>> GetAllOnlineUser()
         {
-            Task<List<StationAttendees>> actionResult =userService.GetAllOnlineUser();
+            Task<List<StationAttendees>> actionResult = userService.GetAllOnlineUser();
             return actionResult;
 
         }
 
         [HttpGet("{id}")]
-        public string test (string id)
+        public string test(string id)
         {
             return id;
 
@@ -37,4 +37,3 @@ namespace API_premierductsqld.Controllers
 
     }
 }
- 

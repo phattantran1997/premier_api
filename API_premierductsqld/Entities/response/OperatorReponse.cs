@@ -1,7 +1,7 @@
 ﻿using System;
 namespace API_premierductsqld.Entities.response
 {
-    public class OperatorReponse
+    public class UserReportResponse
     {
         public string Name { get; set; }
         public string Username { get; set; }

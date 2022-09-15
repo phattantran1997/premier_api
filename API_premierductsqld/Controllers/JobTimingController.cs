@@ -33,30 +33,28 @@ namespace API_premierductsqld.Controllers
 
         }
 
-
-    /// <summary>
-    /// Get list jobno which were string by specific date.
-    /// </summary>
-    /// 
-    /// <param name="date"></param>
-    ///  <param name="end"></param>
-    /// <returns></returns>
-    [HttpGet("list/dates")]
-        public ResponseData getListJobNoString([Required]string date, string end)
+        /// <summary>
+        /// Get list jobno which were string by specific date.
+        /// </summary>
+        /// 
+        /// <param name="date"></param>
+        ///  <param name="end"></param>
+        /// <returns></returns>
+        [HttpGet("list/dates")]
+        public ResponseData getListJobNoString([Required] string date, string end)
         {
 
             return jobTimingService.getListJobNoString(date, end);
         }
 
-
-    /// <summary>
-    /// Get all data include jobno, history, total duration by startdate and enddate
-    /// </summary>
-    /// 
-    /// <param name="date"></param>
-    /// <param name="end"></param>
-    /// <returns></returns>
-    [HttpGet("all/data/tab3")]
+        /// <summary>
+        /// Get all data include jobno, history, total duration by startdate and enddate
+        /// </summary>
+        /// 
+        /// <param name="date"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        [HttpGet("all/data/tab3")]
         public Task<ResponseData> getAllDataTabs3([Required] string date, string end)
         {
             string token = Request.Headers["Token"].FirstOrDefault()?.Split(" ").Last();
@@ -86,12 +84,9 @@ namespace API_premierductsqld.Controllers
         public ResponseData getAllDataJobtimingByDate(string date)
         {
 
-           return jobTimingService.getAllDataJobtimingByDate(date);
-           
+            return jobTimingService.getAllDataJobtimingByDate(date);
+
         }
-
- 
-
 
     }
 }

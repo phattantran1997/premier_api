@@ -6,7 +6,7 @@ namespace API_premierductsqld.Controllers
 {
     [ApiController]
     [Route("station")]
-    public class StationController :ControllerBase
+    public class StationController : ControllerBase
     {
 
         StationService stationService;
@@ -26,7 +26,6 @@ namespace API_premierductsqld.Controllers
 
             return stationService.getAllStation();
 
-
         }
 
         /// <summary>
@@ -43,7 +42,6 @@ namespace API_premierductsqld.Controllers
             return stationService.getDurationOfStation(jobno, stationNo);
 
         }
-
 
     }
 }

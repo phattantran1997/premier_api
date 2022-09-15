@@ -6,7 +6,6 @@ namespace DTO_PremierDucts.Utils
     public class StringUtils
     {
 
-
         public static string MD5Hash(string input)
         {
             StringBuilder hash = new StringBuilder();
@@ -31,6 +30,13 @@ namespace DTO_PremierDucts.Utils
             {
                 return false;
             }
+        }
+
+        public static string[] SubArray(string[] data, int index, int length)
+        {
+            string[] result = new string[length];
+            Array.Copy(data, index, result, 0, length);
+            return result;
         }
     }
 }
