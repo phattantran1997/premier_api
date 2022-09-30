@@ -5,44 +5,48 @@ namespace DTO_PremierDucts.Entities
 {
     public class DispatchDetail
     {
-        public string operatorID { get; set; }
-        public string jobday { get; set; }
-        public string jobtime { get; set; }
-        public string duration { get; set; }
-        public string receiverName { get; set; }
-        public string receiverEmail { get; set; }
-        public string stationName { get; set; }
-        public string jobno { get; set; }
-        public string drawingno { get; set; }
-        public string handle { get; set; }
-        public string itemno { get; set; }
-        public string insulation { get; set; }
-        public string galvenized { get; set; }
-        public string notes { get; set; }
-        public string weight { get; set; }
-        public string status { get; set; }
-        public double qty { get; set; }
-        public string cuttype { get; set; }
-        public string cid { get; set; }
-        public string description { get; set; }
-        public string doublewall { get; set; }
-        public int pathId { get; set; }
-        public string insulationarea { get; set; }
-        public string metalarea { get; set; }
-        public string boughtout { get; set; }
-        public string linearmeter { get; set; }
-        public string sectionindex { get; set; }
-        public string sectiondescription { get; set; }
-        public string prefixstring { get; set; }
-        public string insulationSpec { get; set; }
-        public string widthDim { get; set; }
-        public string depthDim { get; set; }
-        public string lengthangle { get; set; }
-        public string connector { get; set; }
-        public string material { get; set; }
-        public string equipmentTag { get; set; }
-        public string jobArea { get; set; }
-        public string filename { get; set; }
+        public string operatorID { get; set; } = string.Empty;
+        public string jobday { get; set; } = string.Empty;
+        public string jobtime { get; set; } = string.Empty;
+        public string duration { get; set; } = string.Empty;
+        public string receiverName { get; set; } = string.Empty;
+        public string receiverEmail { get; set; } = string.Empty;
+        public string stationName { get; set; } = string.Empty;
+        public string jobno { get; set; } = string.Empty;
+        public string drawingno { get; set; } = string.Empty;
+        public string handle { get; set; } = string.Empty;
+        public string itemno { get; set; } = string.Empty;
+        public string insulation { get; set; } = string.Empty;
+        public string galvenized { get; set; } = string.Empty;
+        public string notes { get; set; } = string.Empty;
+        public string weight { get; set; } = string.Empty;
+        public string status { get; set; } = string.Empty;
+        public double qty { get; set; } = 0;
+        public string cuttype { get; set; } = string.Empty;
+        public string cid { get; set; } = string.Empty;
+        public string description { get; set; } = string.Empty;
+        public string doublewall { get; set; } = string.Empty;
+        public int pathId { get; set; } = 0;
+        public string insulationarea { get; set; } = string.Empty;
+        public string metalarea { get; set; } = string.Empty;
+        public string boughtout { get; set; } = string.Empty;
+        public string linearmeter { get; set; } = string.Empty;
+        public string sectionindex { get; set; } = string.Empty;
+        public string sectiondescription { get; set; } = string.Empty;
+        public string prefixstring { get; set; } = string.Empty;
+        public string insulationSpec { get; set; } = string.Empty;
+        public string widthDim { get; set; } = string.Empty;
+        public string depthDim { get; set; } = string.Empty;
+        public string lengthangle { get; set; } = string.Empty;
+        public string connector { get; set; } = string.Empty;
+        public string material { get; set; } = string.Empty;
+        public string equipmentTag { get; set; } = string.Empty;
+        public string jobArea { get; set; } = string.Empty;
+        public string filename { get; set; } = string.Empty;
+        public string storageInfo { get; set; } = string.Empty;
+        public string resetDay { get; set; } = string.Empty;
+        public string resetTime { get; set; } = string.Empty;
+
         public DispatchDetail()
         {
         }

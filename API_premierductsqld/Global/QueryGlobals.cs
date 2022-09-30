@@ -45,6 +45,9 @@ namespace API_premierductsqld.Global
         ON (job1.jobday = j2.jobday and job1.stationNo= j2.stationNo and job1.jobno = j2.jobno and job1.filename = j2.filename and job1.handle = j2.handle and job1.jobtime < j2.jobtime)
 		where (STR_TO_DATE(target.jobday, '%d/%m/%Y')  between STR_TO_DATE(@PARAM_VAL_1 , '%d/%m/%Y') and STR_TO_DATE(@PARAM_VAL_2 , '%d/%m/%Y')) and j2.operatorID is Null
 		order by job1.jobtime;";
+
+		public static string Query_Report4 = @"SELECT * from report_4
+		where (STR_TO_DATE(jobday, '%d/%m/%Y')  between STR_TO_DATE(@PARAM_VAL_1 , '%d/%m/%Y') and STR_TO_DATE(@PARAM_VAL_2 , '%d/%m/%Y'))";
 	}
 }
 

@@ -40,6 +40,10 @@ namespace API_premierductsqld.Service
         double total_sum_nonprod_time = 0.0;
         double total_sum_prod_time = 0.0;
         double total_total_working_time = 0.0;
+        double total_metal_area_packing = 0.0;
+        double total_insu_area_packing = 0.0;
+        long qty_packing = 0;
+
         public IJobtimingRepository jobtimingRepository;
         public IStationRepository stationRepository;
         private static DBConnection dbCon;
@@ -173,7 +177,6 @@ namespace API_premierductsqld.Service
             jobtimingRepository = new JobtimingRepository();
             stationRepository = new StationRepository();
             dbCon = DBConnection.Instance(Startup.StaticConfig.GetConnectionString("ConnectionForDatabase"));
-
             //Init stations.
             stations = stationRepository.getAllStation();
             //Init emails
@@ -507,11 +510,11 @@ namespace API_premierductsqld.Service
 
                     table.Rows.Add("TOTAL", "", "", "", "", TimeSpan.FromSeconds(parentJobno.Sum(item => TimeSpan.Parse(item.duration).TotalSeconds)),
                         "", "metal: " + Math.Round(items_withInsu.Sum(item => Convert.ToDouble(item.metalarea)), 2) + "\n" +
-                        "insulation: " + Math.Round(items_withInsu.Sum(item => Convert.ToDouble(item.insulationarea)) / 1000000, 2), "","");
+                        "insulation: " + Math.Round(items_withInsu.Sum(item => Convert.ToDouble(item.insulationarea)) / 1000000, 2), "", "");
                     table.Rows.Add();
                 }
-                table.Rows.Add("TOTAL", "", "", "", "", (int)TimeSpan.FromSeconds(sum_duration).TotalHours + TimeSpan.FromSeconds(sum_duration).ToString(@"\:mm\:ss"), "", "metal: "+ metal_item_withoutinsu +"\n"+ "insulation: "+ insu_item_withoutinsu,sum_metal,sum_insu);
-                table.Rows.Add("RATE", "", "", "", "", Math.Round((sum_duration/60) /sum_items_with_insu,2) + " (minutes / number of items with insu)", "",Math.Round( metal_item_withoutinsu / sum_items_with_insu,2) + "(metal m2 / number of items with insu)", "", "");
+                table.Rows.Add("TOTAL", "", "", "", "", (int)TimeSpan.FromSeconds(sum_duration).TotalHours + TimeSpan.FromSeconds(sum_duration).ToString(@"\:mm\:ss"), "", "metal: " + metal_item_withoutinsu + "\n" + "insulation: " + insu_item_withoutinsu, sum_metal, sum_insu);
+                table.Rows.Add("RATE", "", "", "", "", Math.Round((sum_duration / 60) / sum_items_with_insu, 2) + " (minutes / number of items with insu)", "", Math.Round(metal_item_withoutinsu / sum_items_with_insu, 2) + "(metal m2 / number of items with insu)", "", "");
             }
             catch (Exception e)
             {
@@ -753,8 +756,6 @@ namespace API_premierductsqld.Service
             if (date != null)
             {
                 current = date;
-                
-
             }
             File.Delete(current.Replace("/", "") + ".xlsx");
         }
@@ -920,6 +921,55 @@ namespace API_premierductsqld.Service
             DataTable straightFinish_table = dataStraightFinish();
             toCSVWithSheets(4, table, packing_table, insulationCutting_table, sealtape_table, straightFinish_table);
             EmailUtils.SendEmail(current.Replace("/", ""), "Report Daily", listEmails);
+
+            //Save data on table report_4
+            SaveData(new Report4DataEachDateRequest
+            {
+                jobday = current,
+                total_sum_nonprod_time = total_sum_nonprod_time,
+                total_sum_prod_time = total_sum_prod_time,
+                total_total_working_time = total_total_working_time,
+                totalMetalArea = packing_table.AsEnumerable().Sum(item => item.Field<double>("METALAREA")),
+                totalInsulationlArea = packing_table.AsEnumerable().Sum(item => item.Field<double>("INSULATIONAREA")),
+                qty = packing_table.AsEnumerable().Select(item => item.Field<string>("ITEM NUMBER")).Count(),
+            });
+        }
+
+        private void SaveData(Report4DataEachDateRequest request)
+        {
+            try
+            {
+                if (dbCon.IsConnect())
+                {
+                    string insertData = "insert into report_4 (jobday,total_sum_nonprod_time,total_sum_prod_time,total_total_working_time, totalMetalArea, totalInsulationlArea , qty) " +
+                        "values (@jobday , @total_sum_nonprod_time , @total_sum_prod_time , @total_total_working_time, @totalMetalArea, @totalInsulationlArea , @qty)";
+                    MySqlCommand command = new MySqlCommand(insertData, dbCon.Connection);
+
+                    command.Parameters.AddWithValue("@jobday", request.jobday);
+                    command.Parameters.AddWithValue("@total_sum_nonprod_time", request.total_sum_nonprod_time);
+                    command.Parameters.AddWithValue("@total_sum_prod_time", request.total_sum_prod_time);
+                    command.Parameters.AddWithValue("@total_total_working_time", request.total_total_working_time);
+                    command.Parameters.AddWithValue("@totalMetalArea", request.totalMetalArea);
+                    command.Parameters.AddWithValue("@totalInsulationlArea", request.totalInsulationlArea);
+                    command.Parameters.AddWithValue("@qty", request.qty);
+                    dbCon.Connection.Open();
+                    int result = command.ExecuteNonQuery();
+                    Debug.WriteLine("\n" + result);
+                    command.Dispose();
+
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                dbCon.Close();
+            }
+
+
         }
         #endregion
         public void getJobTimingDetail(string jobday, string operatorID, DataTable table)
@@ -1029,15 +1079,11 @@ namespace API_premierductsqld.Service
                     }
                     if (jobtimingsWithout[i].itemno == "Station")
                     {
-
-
-
                         time_non_production_on_each_user = time_non_production_on_each_user + (time2 - time1);
 
                     }
                     else
                     {
-
                         time_production_on_each_user = time_production_on_each_user + (time2 - time1);
 
                     }
@@ -1055,13 +1101,12 @@ namespace API_premierductsqld.Service
             }
         }
 
-        public string reportForWeekend(string date)
+        public void reportForWeekend(string date)
         {
             DateTime dateTime = DateTime.Today;
             if (date != null)
             {
                 dateTime = DateTime.ParseExact(date, "d/M/yyyy", CultureInfo.InvariantCulture);
-
             }
             DateTime startOfWeek = dateTime.AddDays(
             (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek -
@@ -1074,12 +1119,10 @@ namespace API_premierductsqld.Service
                  .AddDays(i)
                  .ToString("d/M/yyyy")).ToList();
 
-
             List<ReportWeekendResponse> reportWeekendResponses = new List<ReportWeekendResponse>();
             foreach (String dateinweek in valueOfWeek)
             {
                 reportForEachDate(dateinweek, reportWeekendResponses);
-
             }
             var groupByListResponse = reportWeekendResponses.GroupBy(i => i.user).Select(cl =>
               new
@@ -1143,13 +1186,109 @@ namespace API_premierductsqld.Service
 
             ToCSVWeekend(file_name_weekly, table);
             EmailUtils.SendEmail(file_name_weekly, "REPORT WEEKLY", listEmails);
-
-            return valueOfWeek.ToString();
+            File.Delete(file_name_weekly + ".xlsx");
         }
+
+        //public void reportForWeekendPacking(string date)
+        //{
+        //    DateTime dateTime = DateTime.Today;
+        //    if (date != null)
+        //    {
+        //        dateTime = DateTime.ParseExact(date, "d/M/yyyy", CultureInfo.InvariantCulture);
+
+        //    }
+        //    DateTime startOfWeek = dateTime.AddDays(
+        //    (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek -
+        //    (int)dateTime.DayOfWeek);
+        //    DataTable table = new DataTable();
+        //    DataTable resultFromQuery = new DataTable();
+        //    List<String> valueOfWeek = Enumerable
+        //      .Range(1, 6)
+        //      .Select(i => startOfWeek
+        //         .AddDays(i)
+        //         .ToString("d/M/yyyy")).ToList();
+        //    string file_name_weekly = "weekly_packing_" + valueOfWeek.First().Replace("/", "") + "_" + valueOfWeek.Last().Replace("/", "");
+
+        //    table.Columns.Add("DATE", typeof(string));
+        //    table.Columns.Add("QTY", typeof(string));
+        //    table.Columns.Add("METALAREA", typeof(string));
+        //    table.Columns.Add("INSULATIONAREA", typeof(string));
+        //    table.Columns.Add("PRODUCTION-HR", typeof(string));
+        //    table.Columns.Add("NON-PRODUCTION-HR", typeof(string));
+        //    table.Columns.Add("TOTAL HOURS", typeof(string));
+
+        //    try
+        //    {
+        //        if (dbCon.IsConnect())
+        //        {
+        //            MySqlDataAdapter myDataAdapter = new MySqlDataAdapter(QueryGlobals.Query_PackingInforWeekend_2, dbCon.Connection);
+        //            myDataAdapter.SelectCommand.CommandTimeout = 200;
+        //            myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_1", valueOfWeek.First());
+        //            myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_2", valueOfWeek.Last());
+        //            myDataAdapter.Fill(resultFromQuery);
+
+        //            double sum_insu = 0.0;
+        //            double sum_metal = 0.0;
+        //            double sum_time_production = 0.0;
+        //            double sum_time_non_production = 0.0;
+        //            double sum_time_working = 0.0;
+        //            int item_count = 0;
+        //            foreach (string dateinweek in valueOfWeek)
+        //            {
+        //                current = dateinweek;
+        //                //jobTimings = jobtimingRepository.getAllDataJobtimingByDate(current);
+        //                //userForReport = jobTimings.Where(x => x.operatorID != "hung.q").GroupBy(x => x.operatorID).Select(item => new { username = item.Key }).ToList().Select(x => x.username).ToList();
+        //                reportResponses = new List<ReportResponse>();
+        //                UserDataForReport();
+        //                report4data();
+        //                foreach (ReportResponse respone in reportResponses)
+        //                {
+        //                    double sign_in = TimeSpan.Parse(respone.time_start != null ? respone.time_start : "00:00:00").TotalSeconds;
+        //                    double sign_out = TimeSpan.Parse(respone.time_finished != null ? respone.time_finished : "00:00:00").TotalSeconds;
+        //                    double total_breaking = TimeSpan.Parse(respone.sum_time_break != null ? respone.sum_time_break : "00:00:00").TotalSeconds;
+        //                    double temp = sign_out - sign_in - total_breaking;
+        //                    total_total_working_time += temp;
+        //                }
+        //                var childResult = resultFromQuery.AsEnumerable().Where(item => item.Field<string>("jobday") == dateinweek).ToList();
+        //                var metal = Math.Round(childResult.Sum(row => Convert.ToDouble(row.Field<string>("metalarea"))), 2); // use correct data type
+        //                var insu = Math.Round(childResult.Sum(row => Convert.ToDouble(row.Field<string>("insuarea")) / 1000000), 2);
+
+
+        //                item_count += childResult.Count;
+        //                table.Rows.Add(dateinweek, childResult.Count, metal, insu,
+        //                      (int)TimeSpan.FromSeconds(total_sum_prod_time).TotalHours + TimeSpan.FromSeconds(total_sum_prod_time).ToString(@"\:mm\:ss"),
+        //               (int)TimeSpan.FromSeconds(total_sum_nonprod_time).TotalHours + TimeSpan.FromSeconds(total_sum_nonprod_time).ToString(@"\:mm\:ss"),
+        //               (int)TimeSpan.FromSeconds(total_total_working_time).TotalHours + TimeSpan.FromSeconds(total_total_working_time).ToString(@"\:mm\:ss"));
+        //                table.Rows.Add();
+        //                sum_metal += metal;
+        //                sum_insu += insu;
+        //                sum_time_production += total_sum_prod_time;
+        //                sum_time_non_production += total_sum_nonprod_time;
+        //                sum_time_working += total_total_working_time;
+        //            }
+
+        //            table.Rows.Add("TOTAL", item_count, Math.Round( sum_metal,2), Math.Round( sum_insu,2), (int)TimeSpan.FromSeconds(sum_time_production).TotalHours + TimeSpan.FromSeconds(sum_time_production).ToString(@"\:mm\:ss"),
+        //     (int)TimeSpan.FromSeconds(sum_time_non_production).TotalHours + TimeSpan.FromSeconds(sum_time_non_production).ToString(@"\:mm\:ss"),
+        //     (int)TimeSpan.FromSeconds(sum_time_working).TotalHours + TimeSpan.FromSeconds(sum_time_working).ToString(@"\:mm\:ss"));
+        //            ToCSVWeekend(file_name_weekly, table);
+        //            EmailUtils.SendEmail(file_name_weekly, "REPORT WEEKLY PACKING", listEmails);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw e;
+        //    }
+        //    finally
+        //    {
+        //        dbCon.Close();
+        //        File.Delete(file_name_weekly + ".xlsx");
+        //    }
+
+
+        //}
 
         public void reportForWeekendPacking(string date)
         {
-
             DateTime dateTime = DateTime.Today;
             if (date != null)
             {
@@ -1160,74 +1299,67 @@ namespace API_premierductsqld.Service
             (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek -
             (int)dateTime.DayOfWeek);
             DataTable table = new DataTable();
-
+            DataTable resultFromQuery = new DataTable();
             List<String> valueOfWeek = Enumerable
               .Range(1, 6)
               .Select(i => startOfWeek
                  .AddDays(i)
                  .ToString("d/M/yyyy")).ToList();
-            string file_name_weekly = "weekly_" + valueOfWeek.First().Replace("/", "") + "_" + valueOfWeek.Last().Replace("/", "");
+            string file_name_weekly = "weekly_packing_" + valueOfWeek.First().Replace("/", "") + "_" + valueOfWeek.Last().Replace("/", "");
 
             table.Columns.Add("DATE", typeof(string));
             table.Columns.Add("QTY", typeof(string));
-            table.Columns.Add("METALAREA", typeof(string));
-            table.Columns.Add("INSULATIONAREA", typeof(string));
+            table.Columns.Add("METALAREA", typeof(double));
+            table.Columns.Add("INSULATIONAREA", typeof(double));
             table.Columns.Add("PRODUCTION-HR", typeof(string));
             table.Columns.Add("NON-PRODUCTION-HR", typeof(string));
             table.Columns.Add("TOTAL HOURS", typeof(string));
 
-            DataTable resultFromQuery = new DataTable();
-            MySqlDataAdapter myDataAdapter = new MySqlDataAdapter(QueryGlobals.Query_PackingInforWeekend_2, dbCon.Connection);
-            myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_1", valueOfWeek.First());
-            myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_2", valueOfWeek.Last());
-            myDataAdapter.Fill(resultFromQuery);
-            double sum_insu = 0.0;
-            double sum_metal = 0.0;
-            double sum_time_production = 0.0;
-            double sum_time_non_production = 0.0;
-            double sum_time_working = 0.0;
-            int item_count = 0;
-            foreach (string dateinweek in valueOfWeek)
+            try
             {
-                current = dateinweek;
-                //jobTimings = jobtimingRepository.getAllDataJobtimingByDate(current);
-                //userForReport = jobTimings.Where(x => x.operatorID != "hung.q").GroupBy(x => x.operatorID).Select(item => new { username = item.Key }).ToList().Select(x => x.username).ToList();
-                reportResponses = new List<ReportResponse>();
-                UserDataForReport();
-                report4data();
-                foreach (ReportResponse respone in reportResponses)
+                double sum_time_non_production = 0.0;
+                double sum_time_production = 0.0;
+                double sum_time_working = 0.0;
+                if (dbCon.IsConnect())
                 {
-                    double sign_in = TimeSpan.Parse(respone.time_start != null ? respone.time_start : "00:00:00").TotalSeconds;
-                    double sign_out = TimeSpan.Parse(respone.time_finished != null ? respone.time_finished : "00:00:00").TotalSeconds;
-                    double total_breaking = TimeSpan.Parse(respone.sum_time_break != null ? respone.sum_time_break : "00:00:00").TotalSeconds;
-                    double temp = sign_out - sign_in - total_breaking;
-                    total_total_working_time += temp;
+                    MySqlDataAdapter myDataAdapter = new MySqlDataAdapter(QueryGlobals.Query_Report4, dbCon.Connection);
+                    myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_1", valueOfWeek.First());
+                    myDataAdapter.SelectCommand.Parameters.AddWithValue("@PARAM_VAL_2", valueOfWeek.Last());
+                    myDataAdapter.Fill(resultFromQuery);
+
+                    foreach (DataRow row in resultFromQuery.Rows)
+                    {
+                        table.Rows.Add(row.Field<string>("jobday"), row.Field<string>("qty"),
+                            Math.Round(row.Field<Single>("totalMetalArea"),2), Math.Round(row.Field<Single>("totalInsulationlArea"),2),
+                             (int)TimeSpan.FromSeconds(row.Field<Single>("total_sum_prod_time")).TotalHours + TimeSpan.FromSeconds(row.Field<Single>("total_sum_prod_time")).ToString(@"\:mm\:ss"),
+                             (int)TimeSpan.FromSeconds(row.Field<Single>("total_sum_nonprod_time")).TotalHours + TimeSpan.FromSeconds(row.Field<Single>("total_sum_nonprod_time")).ToString(@"\:mm\:ss"),
+                             (int)TimeSpan.FromSeconds(row.Field<Single>("total_total_working_time")).TotalHours + TimeSpan.FromSeconds(row.Field<Single>("total_total_working_time")).ToString(@"\:mm\:ss"));
+                        sum_time_non_production += row.Field<Single>("total_sum_nonprod_time");
+                        sum_time_production += row.Field<Single>("total_sum_prod_time");
+                        sum_time_working += row.Field<Single>("total_total_working_time");
+
+                    }
+
+                    table.Rows.Add("TOTAL", resultFromQuery.AsEnumerable().Sum(item => Convert.ToDouble( item.Field<string>("qty"))), Math.Round(resultFromQuery.AsEnumerable().Sum(item => item.Field<Single>("totalMetalArea")), 2), Math.Round(resultFromQuery.AsEnumerable().Sum(item => item.Field<Single>("totalInsulationlArea")), 2),
+                        (int)TimeSpan.FromSeconds(sum_time_production).TotalHours + TimeSpan.FromSeconds(sum_time_production).ToString(@"\:mm\:ss"),
+             (int)TimeSpan.FromSeconds(sum_time_non_production).TotalHours + TimeSpan.FromSeconds(sum_time_non_production).ToString(@"\:mm\:ss"),
+             (int)TimeSpan.FromSeconds(sum_time_working).TotalHours + TimeSpan.FromSeconds(sum_time_working).ToString(@"\:mm\:ss"));
+                    ToCSVWeekend(file_name_weekly, table);
+                    EmailUtils.SendEmail(file_name_weekly, "REPORT WEEKLY PACKING", listEmails);
                 }
-                var childResult = resultFromQuery.AsEnumerable().Where(item => item.Field<string>("jobday") == dateinweek).ToList();
-                var metal = Math.Round(childResult.Sum(row => Convert.ToDouble(row.Field<string>("metalarea"))), 2); // use correct data type
-                var insu = Math.Round(childResult.Sum(row => Convert.ToDouble(row.Field<string>("insuarea")) / 1000000), 2);
-
-
-                item_count += childResult.Count;
-                table.Rows.Add(dateinweek, childResult.Count, metal, insu,
-                      (int)TimeSpan.FromSeconds(total_sum_prod_time).TotalHours + TimeSpan.FromSeconds(total_sum_prod_time).ToString(@"\:mm\:ss"),
-               (int)TimeSpan.FromSeconds(total_sum_nonprod_time).TotalHours + TimeSpan.FromSeconds(total_sum_nonprod_time).ToString(@"\:mm\:ss"),
-               (int)TimeSpan.FromSeconds(total_total_working_time).TotalHours + TimeSpan.FromSeconds(total_total_working_time).ToString(@"\:mm\:ss"));
-                table.Rows.Add();
-                sum_metal += metal;
-                sum_insu += insu;
-                sum_time_production += total_sum_prod_time;
-                sum_time_non_production += total_sum_nonprod_time;
-                sum_time_working += total_total_working_time;
             }
-            table.Rows.Add("TOTAL", item_count, sum_metal, sum_insu, (int)TimeSpan.FromSeconds(sum_time_production).TotalHours + TimeSpan.FromSeconds(sum_time_production).ToString(@"\:mm\:ss"),
-               (int)TimeSpan.FromSeconds(sum_time_non_production).TotalHours + TimeSpan.FromSeconds(sum_time_non_production).ToString(@"\:mm\:ss"),
-               (int)TimeSpan.FromSeconds(sum_time_working).TotalHours + TimeSpan.FromSeconds(sum_time_working).ToString(@"\:mm\:ss"));
-            ToCSVWeekend(file_name_weekly, table);
-            EmailUtils.SendEmail(file_name_weekly, "REPORT WEEKLY", listEmails);
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                dbCon.Close();
+                File.Delete(file_name_weekly + ".xlsx");
+            }
+
 
         }
-
         public void ToCSVWeekend(string file_name, DataTable dtDataTable)
         {
             XLWorkbook wb = new XLWorkbook();
@@ -1241,7 +1373,6 @@ namespace API_premierductsqld.Service
         #endregion
         private void toCSVWithSheets(int period, params DataTable[] report_dataTable)
         {
-
             XLWorkbook wb = new XLWorkbook();
             if (report_dataTable[0] != null)
             {
@@ -1292,6 +1423,7 @@ namespace API_premierductsqld.Service
                 table_pharmacies.Field("ITEM NUMBER").TotalsRowFunction = XLTotalsRowFunction.Count;
                 table_pharmacies.Field("METALAREA").TotalsRowFunction = XLTotalsRowFunction.Sum;
                 table_pharmacies.Field("INSULATIONAREA").TotalsRowFunction = XLTotalsRowFunction.Sum;
+
                 table_pharmacies.Field(0).TotalsRowLabel = "TOTAL SUM:";
 
             }
@@ -1309,10 +1441,10 @@ namespace API_premierductsqld.Service
             if (report_dataTable[3] != null)
             {
                 var ST_sheet = wb.Worksheets.Add("Seal Tape");
-               
+
                 var ST_table = ST_sheet.Cell(1, 1).InsertTable(report_dataTable[3]);
                 ST_sheet.Cell(report_dataTable[3].Rows.Count, 1).Style.Font.Bold = true;
-                ST_sheet.Cell(report_dataTable[3].Rows.Count +1, 1).Style.Font.Bold = true;
+                ST_sheet.Cell(report_dataTable[3].Rows.Count + 1, 1).Style.Font.Bold = true;
                 ST_sheet.RangeUsed().AddConditionalFormat().WhenContains("TOTAL").Fill.SetBackgroundColor(XLColor.Yellow);
                 ST_sheet.RangeUsed().AddConditionalFormat().WhenContains("RATE").Fill.SetBackgroundColor(XLColor.Yellow);
                 ST_sheet.ColumnWidth = 20;

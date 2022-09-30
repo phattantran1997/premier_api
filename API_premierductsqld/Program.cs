@@ -16,8 +16,8 @@ namespace API_premierductsqld
             var configuration = new ConfigurationBuilder()
         .AddEnvironmentVariables()
         .AddCommandLine(args)
-        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+        .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
         .Build();
 
             var host = Host.CreateDefaultBuilder(args)

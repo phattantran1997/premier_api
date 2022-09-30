@@ -2,6 +2,7 @@
 using System.Data;
 using API_premierductsqld.Entities.response.report;
 using API_premierductsqld.Service;
+using DTO_PremierDucts.JWT_Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_premierductsqld.Controllers
@@ -19,6 +20,7 @@ namespace API_premierductsqld.Controllers
 		}
 
 		[HttpGet("1")]
+		[SkipAuthenticationHeaders]
 		public void Report1(string date)
 		{
 			reportService.report1(date);
@@ -26,6 +28,7 @@ namespace API_premierductsqld.Controllers
 		}
 
 		[HttpGet("2")]
+		[SkipAuthenticationHeaders]
 		public void Report2(string date)
 		{
 			reportService.report2(date);
@@ -33,6 +36,7 @@ namespace API_premierductsqld.Controllers
 		}
 
 		[HttpGet("3")]
+		[SkipAuthenticationHeaders]
 		public void Report3(string date)
 		{
 
@@ -41,26 +45,29 @@ namespace API_premierductsqld.Controllers
 		}
 
 		[HttpGet("4")]
+		[SkipAuthenticationHeaders]
 		public void Report4(string date)
 		{
 			reportService.report4(date);
-
 		}
 
 		[HttpGet("weekend")]
-		public string ReportForWeekend(string date)
+		[SkipAuthenticationHeaders]
+		public void ReportForWeekend(string date)
 		{
-			return reportService.reportForWeekend(date);
+			reportService.reportForWeekend(date);
 
 		}
 
 		[HttpGet("weekend/packing")]
+		[SkipAuthenticationHeaders]
 		public void ReportForWeekendPacking(string date)
 		{
 			reportService.reportForWeekendPacking(date);
 
 		}
 		[HttpDelete("delete")]
+		[SkipAuthenticationHeaders]
 		public void DeleteFiles(string date)
 		{
 			reportService.DeleteDataByDate(date);

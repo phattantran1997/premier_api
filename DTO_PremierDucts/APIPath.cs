@@ -25,7 +25,8 @@ namespace DTO_PremierDucts
 		QLD_GET_ALL,
 		QLD_TOTAL_ALL_M2,
 		QLD_DISPATCH_INFO_BY_LIST_BOX,
-		QLD_DISPATCH_INFO_BY_LIST_JOBNO
+		QLD_DISPATCH_INFO_BY_LIST_JOBNO,
+		QLD_ALL_ITEMS_PER_CAGE
 		#endregion
 
 
@@ -43,12 +44,11 @@ namespace DTO_PremierDucts
            #endregion
 
             #region [PREMIER_DUCTS]
-            {API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING, "jobtiming/data/detail" },
-			{API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING_DETAIL_BY_DATE, "jobtiming/all/data/by_date"},
-
-			{API_TYPE.PREMIER_DUCTS_GET_STATION_DATA, "station/all"},
-			{API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING_DATES, "jobtiming/list/dates" },
-			{API_TYPE.PREMIER_DUCTS_GET_ALL_DURATION_STATION, "station/all/duration" },
+            {API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING, "/jobtiming/data/detail" },
+			{API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING_DETAIL_BY_DATE, "/jobtiming/all/data/by_date"},
+			{API_TYPE.PREMIER_DUCTS_GET_STATION_DATA, "/station/all"},
+			{API_TYPE.PREMIER_DUCTS_GET_ALL_JOBTIMING_DATES, "/jobtiming/list/dates" },
+			{API_TYPE.PREMIER_DUCTS_GET_ALL_DURATION_STATION, "/station/all/duration" },
 
             #endregion
 
@@ -56,7 +56,8 @@ namespace DTO_PremierDucts
             {API_TYPE.QLD_GET_ALL, "/dashboard/get/all/qldata"},
 			{API_TYPE.QLD_TOTAL_ALL_M2, "/dashboard/total/all/m2/by-station"},
 			{API_TYPE.QLD_DISPATCH_INFO_BY_LIST_BOX,"/reportQLD/dispatch/info/box" },
-			{API_TYPE.QLD_DISPATCH_INFO_BY_LIST_JOBNO,"/reportQLD/dispatch/info/jobno" }
+			{API_TYPE.QLD_DISPATCH_INFO_BY_LIST_JOBNO,"/reportQLD/dispatch/info/jobno" },
+			{API_TYPE.QLD_ALL_ITEMS_PER_CAGE,"/reportQLD/dispatch/info/jobno" }
             
             #endregion
         };

@@ -19,7 +19,9 @@ namespace DTO_PremierDucts.EntityResponse
         public string jobtime { get; set; }
         public string duration { get; set; }
         public string jobday { get; set; }
-
+        public string storageInfo { get; set; } = string.Empty;
+        public string resetDay { get; set; } = string.Empty;
+        public string resetTime { get; set; } = string.Empty;
     }
 }
 
